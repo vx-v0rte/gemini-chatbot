@@ -1,33 +1,20 @@
-import os
 import streamlit as st
-import subprocess
-import sys
+import google.generativeai as genai
+import os
 
-# Show installed packages for debugging
-print("📦 Installed packages:")
-subprocess.run([sys.executable, "-m", "pip", "freeze"])
+# Configure API key (make sure you set GOOGLE_API_KEY in Streamlit Secrets)
+genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
-import google.generativeai as genai  # ✅ must match package name in requirements.txt
+# Use the correct model
+MODEL_NAME = "gemini-1.5-flash-latest"
 
-# Load API key (from Streamlit Secrets or local env)
-api_key = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
+if "chat" not in st.session_state:
+    st.session_state.chat = genai.GenerativeModel(MODEL_NAME).start_chat()
 
-if not api_key:
-    st.error("⚠️ No API key found! Please set GOOGLE_API_KEY in Streamlit Secrets.")
-else:
-    genai.configure(api_key=api_key)
+st.title("Gemini Chatbot 🤖")
 
-    st.title("💬 Google Gemini Chatbot")
+user_input = st.text_input("You:", "")
 
-    # Create a model instance
-    model = genai.GenerativeModel("gemini-1.5-flash")
-
-    if "chat" not in st.session_state:
-        st.session_state.chat = model.start_chat()
-
-    user_input = st.text_input("You:", "")
-
-    if st.button("Send") and user_input:
-        response = st.session_state.chat.send_message(user_input)
-        st.write("**Bot:**", response.text)
-
+if user_input:
+    response = st.session_state.chat.send_message(user_input)
+    st.write("**Bot:**", response.text)
