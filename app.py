@@ -1,5 +1,12 @@
 import os
 import streamlit as st
+import subprocess
+import sys
+
+# Show installed packages for debugging
+print("📦 Installed packages:")
+subprocess.run([sys.executable, "-m", "pip", "freeze"])
+
 import google.generativeai as genai  # ✅ must match package name in requirements.txt
 
 # Load API key (from Streamlit Secrets or local env)
@@ -23,3 +30,4 @@ else:
     if st.button("Send") and user_input:
         response = st.session_state.chat.send_message(user_input)
         st.write("**Bot:**", response.text)
+
