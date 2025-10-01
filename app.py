@@ -2,19 +2,23 @@ import streamlit as st
 import google.generativeai as genai
 import os
 
-# Configure API key (make sure you set GOOGLE_API_KEY in Streamlit Secrets)
+# ✅ Configure with API key (must be set in Streamlit secrets or environment variable)
 genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
-# Use the correct model
-MODEL_NAME = "gemini-1.5-flash-latest"
+st.set_page_config(page_title="Gemini Chatbot", page_icon="🤖")
+st.title("💬 Gemini Chatbot")
 
+# Choose your model (fast vs smart)
+MODEL_NAME = "models/gemini-2.5-flash"   # or "models/gemini-2.5-pro"
+
+# Create a chat session if not already in state
 if "chat" not in st.session_state:
-    st.session_state.chat = genai.GenerativeModel(MODEL_NAME).start_chat()
+    st.session_state.chat = genai.GenerativeModel(MODEL_NAME).start_chat(history=[])
 
-st.title("Gemini Chatbot 🤖")
-
+# Input box
 user_input = st.text_input("You:", "")
 
-if user_input:
+# Send button
+if st.button("Send") and user_input:
     response = st.session_state.chat.send_message(user_input)
-    st.write("**Bot:**", response.text)
+    st.write(f"**Bot:** {response.text}")
