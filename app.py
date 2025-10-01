@@ -1,38 +1,31 @@
+import os
 import streamlit as st
 from google import genai
 
-# Configure your API key (replace with yours or use env var)
-API_KEY = "Your api key"
-client = genai.Client(api_key=API_KEY)
+# ✅ Get API key from environment variable (set in system or Streamlit secrets)
+api_key = os.getenv("GOOGLE_API_KEY")
 
-MODEL_NAME = "gemini-2.0-flash-001"
+if not api_key:
+    st.error("❌ No API key found. Please set GOOGLE_API_KEY as an environment variable.")
+    st.stop()
 
-# Session state to keep chat
+# ✅ Initialize client with your API key
+client = genai.Client(api_key=api_key)
+
+# Streamlit app
+st.set_page_config(page_title="Chat with Google GenAI", page_icon="🤖")
+st.title("🤖 Chat with Google GenAI")
+
+# Keep chat history in session
 if "chat" not in st.session_state:
-    st.session_state.chat = client.chats.create(model=MODEL_NAME)
-    st.session_state.history = []
+    st.session_state.chat = client.chats.create(model="gemini-1.5-flash")
 
-st.set_page_config(page_title="Gemini Chatbot", page_icon="🤖")
+# Display conversation
+for msg in st.session_state.chat.history:
+    st.chat_message(msg.role).write(msg.content[0].text)
 
-st.title("🤖 Gemini Chatbot")
-st.write("Chat with your Gemini-powered assistant!")
-
-# Show history
-for role, msg in st.session_state.history:
-    if role == "user":
-        st.chat_message("user").markdown(msg)
-    else:
-        st.chat_message("assistant").markdown(msg)
-
-# User input box
+# Input box for user
 if prompt := st.chat_input("Type your message..."):
-    st.session_state.history.append(("user", prompt))
-    st.chat_message("user").markdown(prompt)
-
+    st.chat_message("user").write(prompt)
     response = st.session_state.chat.send_message(prompt)
-    reply = response.text
-
-    st.session_state.history.append(("assistant", reply))
-    st.chat_message("assistant").markdown(reply)
-
-
+    st.chat_message("model").write(response.text)
