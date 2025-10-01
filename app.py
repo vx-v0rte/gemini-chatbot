@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from google import genai
+import google.genai as genai
 
 # ✅ Get API key from environment variable (set in system or Streamlit secrets)
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -29,3 +29,4 @@ if prompt := st.chat_input("Type your message..."):
     st.chat_message("user").write(prompt)
     response = st.session_state.chat.send_message(prompt)
     st.chat_message("model").write(response.text)
+
