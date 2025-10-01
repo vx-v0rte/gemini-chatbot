@@ -1,2 +1,2 @@
-Google Genai
 streamlit
+google-genai
