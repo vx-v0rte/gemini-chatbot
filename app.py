@@ -39,4 +39,6 @@ if user_input:
     st.session_state.messages.append(("bot", bot_reply))
     
     # Refresh page to show new messages
-    st.experimental_rerun()
+    st.rerun()
+
+
